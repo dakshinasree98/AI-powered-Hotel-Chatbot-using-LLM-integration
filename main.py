@@ -4,7 +4,6 @@ import sqlite3
 from groq import Groq
 from dotenv import load_dotenv
 import logging
-pip install twilio
 
 
 # Initialize Flask app

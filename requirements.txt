@@ -1,6 +1,5 @@
-fastapi
-uvicorn
 streamlit
 pandas
 python-dotenv
 groq
+flask

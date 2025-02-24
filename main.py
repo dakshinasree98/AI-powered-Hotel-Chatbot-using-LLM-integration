@@ -250,3 +250,27 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+from fastapi import FastAPI
+import uvicorn
+import threading
+
+
+app = FastAPI()
+
+@app.post("/query")
+async def chatbot_query(data: dict):
+    query = data.get("query", "No query provided")
+    response = f"Processing your query: {query}"
+    return {"response": response}
+
+def run_fastapi():
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+
+def run_streamlit():
+    os.system("streamlit run main.py")
+
+if __name__ == "__main__":
+    threading.Thread(target=run_fastapi).start()
+    run_streamlit()

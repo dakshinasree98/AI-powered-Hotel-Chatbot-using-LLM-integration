@@ -1,11 +1,10 @@
 from flask import Flask, request, jsonify
 import os
 import sqlite3
-import requests
 from groq import Groq
 from dotenv import load_dotenv
 import logging
-
+from postmark import send_email  # Import the function from postmark.py
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -21,6 +20,10 @@ POSTMARK_API_KEY = os.getenv("POSTMARK_API_KEY")
 SENDER_EMAIL = os.getenv("SENDER_EMAIL")  # Your verified email in Postmark
 if not API_KEY:
     raise ValueError("GROQ_API_KEY not found in environment variables")
+if not POSTMARK_API_KEY:
+    raise ValueError("POSTMARK_API_KEY not found in environment variables")
+if not SENDER_EMAIL:
+    raise ValueError("SENDER_EMAIL not found in environment variables")
 
 groq_client = Groq(api_key=API_KEY)
 

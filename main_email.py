@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 import os
 import sqlite3
+import requests
 from groq import Groq
 from dotenv import load_dotenv
 import logging
@@ -16,10 +17,15 @@ logger = logging.getLogger(__name__)
 # Load environment variables
 load_dotenv()
 API_KEY = os.getenv("GROQ_API_KEY")
+POSTMARK_API_KEY = os.getenv("POSTMARK_API_KEY")
+SENDER_EMAIL = os.getenv("SENDER_EMAIL")  # Your verified email in Postmark
 if not API_KEY:
     raise ValueError("GROQ_API_KEY not found in environment variables")
 
 groq_client = Groq(api_key=API_KEY)
+
+# Store user's email ID for sending later
+user_email = None
 
 # Hotel information constant
 HOTEL_INFO = """Thira Beach Home is a luxurious seaside retreat that seamlessly blends Italian-Kerala heritage architecture with modern luxury, creating an unforgettable experience. Nestled just 150 meters from the magnificent Arabian Sea, our beachfront property offers a secluded and serene escape with breathtaking 180-degree ocean views. 
@@ -101,6 +107,8 @@ def generate_response(query, context):
 
 @app.route('/query', methods=['POST'])
 def handle_query():
+    global user_email  # Store user's email
+
     data = request.get_json()
     query = data.get("query", "")
     email_id = data.get("email", None)  # Capture email if provided
@@ -113,10 +121,11 @@ def handle_query():
     if query_type == "1":  # Booking inquiry
         if not email_id:
             return jsonify({"response": "Please provide your email ID to receive room details."})
-        
+
+        user_email = email_id  # Store email
         room_details = fetch_room_details()
-        send_email(email_id, "Room Availability at Thira Beach Home", room_details)
-        return jsonify({"response": f"Room details have been sent to {email_id}."})
+        send_email(user_email, "Room Availability at Thira Beach Home", room_details)
+        return jsonify({"response": f"Room details have been sent to {user_email}."})
     
     elif query_type == "2":  # General inquiry
         return jsonify({"response": "Thira Beach Home offers luxurious stays with modern amenities."})

@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 import os
 import requests
+import logging 
 from dotenv import load_dotenv
 
 app = Flask(__name__)
@@ -30,7 +31,7 @@ def send_email(to_email, subject, body):
     }
     
     response = requests.post(postmark_url, json=data, headers=headers)
-     if response.status_code == 200:
+    if response.status_code == 200:
         return {"success": True, "message": "Email sent successfully"}
     else:
         return {"success": False, "error": response.text}
